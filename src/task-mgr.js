@@ -1,7 +1,5 @@
 // Need to read up on date-fns and cherry pick, for (at least) checkDue()
-import { format, isAfter } from "date-fns";
-
-const formattedDate = (date) => format(new Date(date), 'PPPP');
+import { format, isPast, parseISO } from "date-fns";
 
 const tasks = {
     list: [],
@@ -11,9 +9,13 @@ const tasks = {
         if (!this.categories.includes(category)) {
             this.categories.push(category);
         };
-        const task = this.list
-                        .push(new Task(name, category, priority, due, details));
+        this.list.push(new Task(name, category, priority, due, details));
     },
+    printStatus() {
+        this.list.forEach(task => {
+            console.log(task.name, task.checkDue().toUpperCase());
+        })
+    }
 };
 
 class Task {
@@ -21,20 +23,26 @@ class Task {
         this.name = name;
         this.category = category;
         this.priority = priority;
-        this.due = due === undefined ? due : formattedDate(due);
+        this.due = due === undefined ? due : new Date(due);
         this.details = details;
     }
 
     status = "yet to do";
 
     edit(property, newValue) {
-        this[property] = property === "due" ? 
-                        formattedDate(newValue) : newValue;
+        this[property] = property === "due" ? new Date(newValue) : newValue;
     }
 
     checkDue() {
-        const currDate = format(new Date(), 'PPPP');
-        console.log(isAfter(currDate, this.due));
+        if (isPast(this.due)) {
+            this.status = "overdue";
+        }
+        return this.status;
+    }
+
+    remove() {
+        const position = tasks.list.indexOf(this);
+        tasks.list.splice(position, 1);
     }
 }
 
