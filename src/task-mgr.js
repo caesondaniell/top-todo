@@ -6,10 +6,15 @@ const tasks = {
     categories: [],
     add(name, ...rest) {
         const [category, priority, due, details] = rest;
-        if (!this.categories.includes(category)) {
-            this.categories.push(category);
-        };
         this.list.push(new Task(name, category, priority, due, details));
+        this.updateCategories();
+    },
+    updateCategories() {
+        this.list.forEach(task => {
+            if (!this.categories.includes(task.category)) {
+                this.categories.push(task.category);
+            };
+        });
     },
     printStatus() {
         this.list.forEach(task => {
@@ -23,14 +28,18 @@ class Task {
         this.name = name;
         this.category = category;
         this.priority = priority;
-        this.due = due === undefined ? due : new Date(due);
+        this.due = due === undefined ? due : parseISO(due);
         this.details = details;
     }
 
     status = "yet to do";
 
+    get formattedDueDate() {
+        return format(this.due, 'PPPP');
+    }
+
     edit(property, newValue) {
-        this[property] = property === "due" ? new Date(newValue) : newValue;
+        this[property] = property === "due" ? parseISO(newValue) : newValue;
     }
 
     checkDue() {
