@@ -16,6 +16,12 @@ const tasks = {
             };
         });
     },
+    focusCategory(category) {
+        if (!this.categories.includes(category)) return alert("Not in list!");
+        const position = this.categories.indexOf(category);
+        this.categories.splice(position, 1);
+        this.categories.unshift(category);
+    },
     printStatus() {
         this.list.forEach(task => {
             console.log(task.name, task.checkDue().toUpperCase());
