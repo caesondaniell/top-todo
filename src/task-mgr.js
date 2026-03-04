@@ -1,32 +1,33 @@
-// Need to read up on date-fns and cherry pick, for (at least) checkDue()
 import { format, isPast, parseISO } from "date-fns";
 
 const tasks = {
-    list: [],
+    closed: [],
     categories: [],
+    open: [],
     add(name, ...rest) {
         const [category, priority, due, details] = rest;
-        this.list.push(new Task(name, category, priority, due, details));
-        this.updateCategories();
-    },
-    updateCategories() {
-        this.list.forEach(task => {
-            if (!this.categories.includes(task.category)) {
-                this.categories.push(task.category);
-            };
-        });
+        this.open.push(new Task(name, category, priority, due, details));
+        this.updateCategories(this.open.at(-1));
     },
     focusCategory(category) {
-        if (!this.categories.includes(category)) return alert("Not in list!");
+        if (!this.categories.includes(category)) {
+            console.log(`'${category}' isn't on the categories list`);
+            return;
+        };
         const position = this.categories.indexOf(category);
         this.categories.splice(position, 1);
         this.categories.unshift(category);
     },
     printStatus() {
-        this.list.forEach(task => {
-            console.log(task.name, task.checkDue().toUpperCase());
+        this.open.forEach(task => {
+            console.log(task.name, task.status.toUpperCase());
         })
-    }
+    },
+    updateCategories({ category }) {
+        if (!this.categories.includes(category)) {
+            this.categories.push(category);
+        };
+    },
 };
 
 class Task {
@@ -38,26 +39,50 @@ class Task {
         this.details = details;
     }
 
-    status = "yet to do";
+    #status = null;
 
     get formattedDueDate() {
         return format(this.due, 'PPPP');
+    }
+
+    get status() {
+        if (this.#status !== null) return this.#status;
+        return isPast(this.due) ? "overdue" : "yet to do";
+    }
+
+    set status(entry) {
+        this.#status = entry;
+    }
+
+    archive() {
+        this.trash();
+        tasks.closed.push(this);
+    }
+
+    complete() {
+        this.status = "did the do";
+        this.archive();
     }
 
     edit(property, newValue) {
         this[property] = property === "due" ? parseISO(newValue) : newValue;
     }
 
-    checkDue() {
-        if (isPast(this.due)) {
-            this.status = "overdue";
-        }
-        return this.status;
+    trash() {
+        const parent = this.whosMyDad();
+        const position = parent.indexOf(this);
+        parent.splice(position, 1);
     }
 
-    remove() {
-        const position = tasks.list.indexOf(this);
-        tasks.list.splice(position, 1);
+    unarchive() {
+        this.trash();
+        tasks.open.push(this);
+        this.status = null;
+    }
+
+    whosMyDad() {
+        const lists = [tasks.open, tasks.closed];
+        return lists.find(list => list.includes(this));
     }
 }
 
