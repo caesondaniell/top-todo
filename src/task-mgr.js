@@ -11,6 +11,7 @@ const tasks = {
         const [category, priority, due, details] = rest;
         this.open.push(new Task(name, category, priority, due, details));
         this.updateCategories(this.open.at(-1));
+        this.arrangeByPriority();
         this.arrangeByDue();
     },
 
@@ -20,6 +21,10 @@ const tasks = {
             return;
         };
         this.open.sort((a, b) => compareAsc(a.due, b.due));
+    },
+
+    arrangeByPriority() {
+        this.open.sort((a, b) => a.priority - b.priority);
     },
 
     focusCategory(category) {
@@ -37,7 +42,7 @@ const tasks = {
             console.log(task.name, task.status.toUpperCase());
         })
     },
-    
+
     updateCategories({ category }) {
         if (!this.categories.includes(category)) {
             this.categories.push(category);
@@ -46,7 +51,7 @@ const tasks = {
 };
 
 class Task {
-    constructor(name, category="general", priority="low", due=undefined, details=undefined) {
+    constructor(name, category="general", priority=3, due=undefined, details=undefined) {
         this.name = name;
         this.category = category;
         this.priority = priority;
