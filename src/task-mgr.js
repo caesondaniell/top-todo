@@ -1,14 +1,27 @@
-import { format, isPast, parseISO } from "date-fns";
+import { compareAsc, compareDesc, format, isPast, parseISO } from "date-fns";
 
 const tasks = {
-    closed: [],
     categories: [],
+
+    closed: [],
+
     open: [],
+
     add(name, ...rest) {
         const [category, priority, due, details] = rest;
         this.open.push(new Task(name, category, priority, due, details));
         this.updateCategories(this.open.at(-1));
+        this.arrangeByDue();
     },
+
+    arrangeByDue(option = "asc") {
+        if (option === "desc") {
+            this.open.sort((a, b) => compareDesc(a.due, b.due));
+            return;
+        };
+        this.open.sort((a, b) => compareAsc(a.due, b.due));
+    },
+
     focusCategory(category) {
         if (!this.categories.includes(category)) {
             console.log(`'${category}' isn't on the categories list`);
@@ -18,11 +31,13 @@ const tasks = {
         this.categories.splice(position, 1);
         this.categories.unshift(category);
     },
+
     printStatus() {
         this.open.forEach(task => {
             console.log(task.name, task.status.toUpperCase());
         })
     },
+    
     updateCategories({ category }) {
         if (!this.categories.includes(category)) {
             this.categories.push(category);
@@ -38,6 +53,8 @@ class Task {
         this.due = due === undefined ? due : parseISO(due);
         this.details = details;
     }
+
+    created = new Date();
 
     #status = null;
 
