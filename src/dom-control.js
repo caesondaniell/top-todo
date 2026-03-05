@@ -16,24 +16,18 @@ function createElement(element) {
 
 function renderTabs() {
     const tabs = document.querySelector(".tabs");
+    tabs.innerHTML = "";
     tasks.categories.forEach(category => {
         const tab = createButton();
         tab.textContent = category;
         tab.classList.add("list-tab");
-        tab.addEventListener("click", () => {
-            displayedList = tasks.open.filter(task => {
-                task.category === category;
-            });
-            const list = document.querySelector(".list-display");
-            list.innerHTML = "";
-            renderTasks();
-        })
         tabs.appendChild(tab);
     });
 }
 
 function renderTasks() {
     const list = document.querySelector(".list-display");
+    list.innerHTML = "";
     displayedList.forEach(task => {
         const card = createDiv();
         const title = createH3();
@@ -66,6 +60,14 @@ export function renderPage() {
     tabs.classList.add("tabs");
     listDisplay.classList.add("list-display");
     pageTitle.textContent = "My To-Dos";
+    tabs.addEventListener("click", (e) => {
+        const btn = e.target.closest(".list-tab");
+        if (!btn) return;
+        tabs.querySelector(".active")?.classList.remove("active");
+        btn.classList.add("active");
+        displayedList = tasks.open.filter((task) => task.category === btn.textContent);
+        renderTasks();
+    });
     main.appendChild(pageTitle);
     main.appendChild(tabs);
     main.appendChild(listDisplay);
