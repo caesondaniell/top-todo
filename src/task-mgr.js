@@ -64,7 +64,7 @@ class Task {
     #status = null;
 
     get formattedDueDate() {
-        return format(this.due, 'PPPP');
+        return this.due !== undefined ? format(this.due, 'PPPP') : "";
     }
 
     get status() {
