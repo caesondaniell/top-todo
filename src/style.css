@@ -6,9 +6,30 @@
   box-sizing: border-box;
 }
 
+.head {
+  position: relative;
+}
+
 h1 {
+  flex: 1;
   text-align: center;
   margin: 0.5rem;
+}
+
+.menu {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: canvas;
+  border: none;
+}
+
+.menu:hover {
+  cursor: pointer;
+}
+
+.material-symbols-outlined {
+  vertical-align: middle;
 }
 
 .list-tab {
