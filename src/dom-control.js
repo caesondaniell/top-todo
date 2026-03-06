@@ -16,12 +16,16 @@ function createElement(element) {
 
 function renderTabs() {
     const tabs = document.querySelector(".tabs");
-    tabs.innerHTML = "";
+    const btns = [...document.querySelectorAll(".list-tab")];
+    const currBtns = btns.map(btn => btn.dataset.category);
     tasks.categories.forEach(category => {
-        const tab = createButton();
-        tab.textContent = category;
-        tab.classList.add("list-tab");
-        tabs.appendChild(tab);
+        if (!currBtns.includes(category)) {
+            const tab = createButton();
+            tab.textContent = category;
+            tab.classList.add("list-tab");
+            tab.setAttribute("data-category", category);
+            tabs.appendChild(tab);
+        };
     });
 }
 
@@ -55,19 +59,30 @@ export function renderPage() {
     const main = createDiv();
     const pageTitle = createH1();
     const tabs = createDiv();
+    const allTab = createButton();
     const listDisplay = createDiv();
     main.classList.add("main");
     tabs.classList.add("tabs");
+    allTab.classList.add("list-tab");
+    allTab.classList.add("active");
     listDisplay.classList.add("list-display");
+    allTab.setAttribute("data-category", "all");
     pageTitle.textContent = "My To-Dos";
+    allTab.textContent = "all tasks"
     tabs.addEventListener("click", (e) => {
         const btn = e.target.closest(".list-tab");
+        const category = btn.dataset.category;
         if (!btn) return;
         tabs.querySelector(".active")?.classList.remove("active");
         btn.classList.add("active");
-        displayedList = tasks.open.filter((task) => task.category === btn.textContent);
+        if (category === "all") {
+            displayedList = tasks.open;
+        } else {
+            displayedList = tasks.open.filter((t) => t.category === category);
+        }
         renderTasks();
     });
+    tabs.appendChild(allTab);
     main.appendChild(pageTitle);
     main.appendChild(tabs);
     main.appendChild(listDisplay);
