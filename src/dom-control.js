@@ -16,8 +16,14 @@ function createElement(element) {
 
 function renderTabs() {
     const tabs = document.querySelector(".tabs");
-    const btns = [...document.querySelectorAll(".list-tab")];
-    const currBtns = btns.map(btn => btn.dataset.category);
+    document.querySelectorAll(".list-tab").forEach(btn => {
+        const label = btn.dataset.category;
+        if (label !== "all" && !tasks.categories.includes(label)) {
+            btn.remove();
+        };
+    });
+    const currBtns = [...document.querySelectorAll(".list-tab")]
+                        .map(btn => btn.dataset.category);
     tasks.categories.forEach(category => {
         if (!currBtns.includes(category)) {
             const tab = createButton();
