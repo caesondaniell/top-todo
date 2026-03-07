@@ -119,8 +119,8 @@ export function renderPage() {
     optionsIcon.addEventListener("click", toggleOptions);
     tabs.addEventListener("click", (e) => {
         const btn = e.target.closest(".list-tab");
-        const category = btn.dataset.category;
         if (!btn) return;
+        const category = btn.dataset.category;
         tabs.querySelector(".active")?.classList.remove("active");
         btn.classList.add("active");
         if (category === "all") {
