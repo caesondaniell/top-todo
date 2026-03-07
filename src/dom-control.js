@@ -19,6 +19,13 @@ const optionsMenu = (() => {
     const editCategories = createOption("edit_square", "Edit Categories");
     const viewArchive = createOption("folder", "View Closed Tasks");
     container.classList.add("options");
+    viewArchive.addEventListener("click", () => {
+        displayedList = tasks.closed;
+        const tabs = document.querySelector(".tabs");
+        tabs.querySelector(".active")?.classList.remove("active");
+        renderTasks();
+        toggleOptions();
+    })
     container.appendChild(newTask);
     container.appendChild(editCategories);
     container.appendChild(viewArchive);
