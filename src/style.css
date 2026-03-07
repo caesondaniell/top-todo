@@ -11,7 +11,6 @@
 }
 
 h1 {
-  flex: 1;
   text-align: center;
   margin: 0.5rem;
 }
@@ -26,6 +25,26 @@ h1 {
 
 .options-menu:hover {
   cursor: pointer;
+}
+
+.options {
+  position: absolute;
+  z-index: 10;
+  top: 1rem;
+  right: 2rem;
+  left: auto;
+  padding: 0.5em;
+  box-shadow: -2px 2px 3px gray;
+  border-radius: 5px;
+}
+
+.options > p {
+  margin: 0.5em;
+}
+
+.options > p:hover {
+  cursor: pointer;
+  background-color: lightgray;
 }
 
 .material-symbols-outlined {
