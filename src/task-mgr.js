@@ -37,6 +37,21 @@ const tasks = {
         this.categories.unshift(category);
     },
 
+    renameCategory(oldLabel, newLabel) {
+        const position = this.categories.indexOf(oldLabel);
+        if (oldLabel === "") {
+            this.categories.push(newLabel);
+            return;
+        }
+        this.categories.splice(position, 1, newLabel);
+        this.open.forEach(task => {
+            if (task.category === oldLabel) task.category = newLabel;
+        });
+        this.closed.forEach(task => {
+            if (task.category === oldLabel) task.category = newLabel;
+        });
+    },
+
     printStatus() {
         this.open.forEach(task => {
             console.log(task.name, task.status.toUpperCase());

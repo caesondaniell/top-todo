@@ -99,11 +99,15 @@ function createCategoryLine(category = "") {
     line.appendChild(input);
     line.appendChild(trash);
     line.appendChild(accept);
-    // line.addEventListener("click", (e) => {
-    //     const btn = e.target.closest(".icon-button");
-    //     if (!btn) return;
-    //     handleCategoryClick(btn.dataset.function);
-    // })
+    line.addEventListener("click", (e) => {
+        const btn = e.target.closest(".icon-button");
+        if (!btn) return;
+        handleCategoryClick(btn);
+    });
+    line.addEventListener("keyup", (e) => {
+        const focused = document.activeElement;
+        if (focused === input && e.key === "Enter") handleCategoryClick(accept);
+    })
     return line;
 }
 
@@ -226,6 +230,30 @@ export function renderPage() {
     document.body.appendChild(main);
     renderTabs();
     renderTasks();
+}
+
+function handleCategoryClick(btn) {
+    const parent = btn.parentElement;
+    const elements = parent.querySelectorAll(".category-line-item");
+    switch (btn.dataset.function) {
+        case "rename":
+            elements.forEach(element => element.toggleAttribute("hidden"));
+            elements[2].focus();
+            break;
+        case "trash":
+            break;
+        case "accept":
+            const oldLabel = elements[0].textContent;
+            const newLabel = elements[2].value;
+            if (oldLabel !== newLabel) {
+                tasks.renameCategory(oldLabel, newLabel);
+                elements[0].textContent = newLabel;
+                renderTabs();
+                renderTasks();
+            };
+            elements.forEach(element => element.toggleAttribute("hidden"));
+            break;
+    }
 }
 
 function handleOutsideClick(e) {
