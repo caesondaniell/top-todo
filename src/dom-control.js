@@ -33,8 +33,8 @@ const categoryEditor = (() => {
         const items = newLine.querySelectorAll(".category-line-item");
         const input = newLine.querySelector("input");
         items.forEach(item => item.toggleAttribute("hidden"));
-        input.focus();
         body.appendChild(newLine);
+        input.focus();
     });
     header.appendChild(title);
     header.appendChild(add);
@@ -66,6 +66,7 @@ const optionsMenu = (() => {
             categoryList.appendChild(item);
         });
         categoryModal.showModal();
+        toggleOptions();
     });
     container.appendChild(newTask);
     container.appendChild(editCategories);

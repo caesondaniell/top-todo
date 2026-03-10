@@ -20,7 +20,7 @@ h1 {
   margin: 0.5rem;
 }
 
-.category-editor {
+.category-editor[open] {
   margin: auto;
   width: 35ch;
   display: grid;
