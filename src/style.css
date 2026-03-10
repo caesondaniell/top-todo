@@ -6,6 +6,11 @@
   box-sizing: border-box;
 }
 
+.icon-button {
+  background-color: transparent;
+  border: none;
+}
+
 .head {
   position: relative;
 }
@@ -15,12 +20,64 @@ h1 {
   margin: 0.5rem;
 }
 
+.category-editor {
+  margin: auto;
+  width: 35ch;
+  display: grid;
+  padding: 1rem;
+  gap: 1rem;
+  border-radius: 5px;
+}
+
+.category-editor > div:first-child {
+  display: flex;
+  justify-content: space-between;
+}
+
+.category-editor > button {
+  text-transform: uppercase;
+  font-weight: bold;
+  background-color: lightgreen;
+  padding: 0.5em;
+  border-radius: 5px;
+}
+
+.category-list {
+  display: grid;
+  gap: 1em;
+}
+
+.category-list > div {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.category-list > div:nth-child(even) {
+  background-color: whitesmoke;
+}
+
+.category-list p,
+.category-list input {
+  margin-right: auto;
+}
+
+.category-list input {
+  width: 15ch;
+  font-size: 1.2rem;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+.category-editor::backdrop {
+  background-color: hsl(0 0% 0% / 0.5);
+  backdrop-filter: blur(2px);
+}
+
 .options-menu {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background-color: canvas;
-  border: none;
 }
 
 .options-menu:hover {
