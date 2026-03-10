@@ -27,6 +27,15 @@ const tasks = {
         this.open.sort((a, b) => a.priority - b.priority);
     },
 
+    changeLabel(oldLabel, newLabel) {
+        this.open.forEach(task => {
+            if (task.category === oldLabel) task.category = newLabel;
+        });
+        this.closed.forEach(task => {
+            if (task.category === oldLabel) task.category = newLabel;
+        });
+    },
+
     focusCategory(category) {
         if (!this.categories.includes(category)) {
             console.log(`'${category}' isn't on the categories list`);
@@ -37,6 +46,12 @@ const tasks = {
         this.categories.unshift(category);
     },
 
+    removeCategory(category) {
+        const position = tasks.categories.indexOf(category);
+        tasks.categories.splice(position, 1);
+        this.changeLabel(category, "general");
+    },
+
     renameCategory(oldLabel, newLabel) {
         const position = this.categories.indexOf(oldLabel);
         if (oldLabel === "") {
@@ -44,12 +59,7 @@ const tasks = {
             return;
         }
         this.categories.splice(position, 1, newLabel);
-        this.open.forEach(task => {
-            if (task.category === oldLabel) task.category = newLabel;
-        });
-        this.closed.forEach(task => {
-            if (task.category === oldLabel) task.category = newLabel;
-        });
+        this.changeLabel(oldLabel, newLabel);
     },
 
     printStatus() {

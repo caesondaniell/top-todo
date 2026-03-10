@@ -241,6 +241,17 @@ function handleCategoryClick(btn) {
             elements[2].focus();
             break;
         case "trash":
+            const label = elements[0].textContent;
+            if (label === "general") {
+                alert( "Can't delete the default category." );
+                return;
+            };
+            if (confirm( "Delete this category? All associated tasks will be relabeled as 'general' tasks." )) {
+                parent.parentElement.removeChild(parent);
+                tasks.removeCategory(label);
+                renderTabs();
+                renderTasks();
+            };
             break;
         case "accept":
             const oldLabel = elements[0].textContent;
