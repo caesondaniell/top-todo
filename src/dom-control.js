@@ -44,6 +44,22 @@ const creator = {
         return line;
     },
     element: function(tag) { return document.createElement(tag) },
+    formField: function(tag, title, type="undefined") {
+        const label = this.label();
+        const input = this[tag]();
+
+        label.classList.add(title);
+        label.setAttribute("for", title);
+
+        input.setAttribute("id", title);
+        if (tag === "input") input.setAttribute("type", type);
+
+        label.textContent = title;
+
+        label.append(input);
+
+        return label;
+    },
     icon: function(name) {
         const icon = this.span();
 
@@ -159,30 +175,34 @@ const optionsMenu = (() => {
     document.body.append(menu);
 })();
 
-// const taskCreator = (() => {
-//     const container = creator.createModal();
-//     const taskForm = creator.createForm();
-//     //remove after setting styles
-//     taskForm.toggleAttribute("open");
-//     const taskLabel = createLabel();
-//     const taskField = createInput();
-//     const dueLabel = createLabel();
-//     const dueDate = createInput();
-//     const priorityLabel = createLabel();
-//     const priorityValue = createInput();
-//     const categoryLabel = createLabel();
-//     const categoryAdd = createInput();
-//     const categorySelect = createSelect();
-//     const detailsLabel = createLabel();
-//     const detailsArea = createTextarea();
-//     const submitButton = createInput();
-//     const closeButton = createIconButton("close", "close form");
+const taskBuilder = (() => {
+    const container = creator.dialog();
+    const taskForm = creator.form();
+    const task = creator.formField("input", "task", "text");
+    const due = creator.formField("input", "due", "date");
+    const priority = creator.formField("select", "priority");
+    const category = creator.formField("select", "category");
+    const categoryAdd = creator.input();
+    const details = creator.formField("textarea", "details");
+    const submitButton = creator.input();
+    const closeButton = creator.iconButton("close", "close form");
 
-// })();
+    container.classList.add("task-builder");
+    //remove after setting styles
+    container.toggleAttribute("open");
 
-// function createFormField(label, element, type="undefined") {
+    categoryAdd.id = "new-category";
+    categoryAdd.placeholder = "New category";
 
-// }
+    submitButton.value = "add task";
+    submitButton.type = "submit";
+
+    // submitButton.addEventListener("click", handleSubmit);
+
+    taskForm.append(task, due, priority, category, categoryAdd, details, submitButton);
+    container.append(closeButton, taskForm);
+    document.body.append(container);
+})();
 
 
 
@@ -224,7 +244,7 @@ function renderTasks() {
         const details = creator.p();
         const category = creator.p();
 
-        card.setAttribute("class", `task ${task.status}`);
+        card.setAttribute("class", `task-card ${task.status}`);
         title.classList.add("title");
         due.classList.add("due");
         details.classList.add("details");
