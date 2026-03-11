@@ -2,163 +2,214 @@ import { tasks } from "./task-mgr.js";
 
 let displayedList = tasks.open;
 
-const createButton = createElement("button");
-const createDiv = createElement("div");
-const createH1 = createElement("h1");
-const createH2 = createElement("h2");
-const createH3 = createElement("h3");
-const createInput = createElement("input");
-const createLink = createElement("a");
-const createList = createElement("ul");
-const createListItem = createElement("li");
-const createModal = createElement("dialog");
-const createPara = createElement("p");
-const createSpan = createElement("span");
+const creator = {
+    categoryLine: function(category = "") {
+        const line = this.div();
+        const p = this.p();
+        const input = this.input();
+        const edit = this.iconButton("edit", "rename category");
+        const trash = this.iconButton("delete", "remove category");
+        const accept = this.iconButton("done_outline", "accept changes");
+
+        edit.setAttribute("data-function", "rename");
+        trash.setAttribute("data-function", "trash");
+        accept.setAttribute("data-function", "accept");
+
+        p.classList.add("category-line-item");
+        input.classList.add("category-line-item");
+        edit.classList.add("category-line-item");
+        trash.classList.add("category-line-item");
+        accept.classList.add("category-line-item");
+
+        input.hidden = true;
+        trash.hidden = true;
+        accept.hidden = true;
+
+        p.textContent = category;
+        input.value = p.textContent;
+
+        line.append(p, edit, input, trash, accept);
+
+        line.addEventListener("click", (e) => {
+            const btn = e.target.closest(".icon-button");
+            if (!btn) return;
+            handleCategoryClick(btn);
+        });
+
+        line.addEventListener("keyup", (e) => {
+            const focused = document.activeElement;
+            if (focused === input && e.key === "Enter") handleCategoryClick(accept);
+        });
+
+        return line;
+    },
+    element: function(tag) { return document.createElement(tag) },
+    icon: function(name) {
+        const icon = this.span();
+
+        icon.classList.add("material-symbols-outlined");
+        icon.toggleAttribute("aria-hidden");
+        icon.textContent = name;
+
+        return icon;
+    },
+    iconButton: function(name, desc) {
+        const button = this.button();
+        const icon = this.icon(name);
+
+        button.append(icon);
+
+        button.setAttribute("aria-label", desc);
+        button.classList.add("icon-button");
+
+        return button;
+    },
+    menuOption: function(iconName, label) {
+        const p = this.p();
+        const icon = this.icon(iconName);
+
+        p.textContent = ` ${label}`;
+        p.prepend(icon);
+
+        return p;
+    },
+};
+
+const tags = [
+    "button",
+    "dialog",
+    "div",
+    "form",
+    "h1",
+    "h2",
+    "h3",
+    "input",
+    "label",
+    "option",
+    "p",
+    "select",
+    "span",
+    "textarea",
+];
+
+tags.forEach(tag => {
+    creator[tag] = function() {
+        return this.element(tag);
+    };
+});
 
 const categoryEditor = (() => {
-    const container = createModal();
-    const header = createDiv();
-    const body = createDiv();
-    const add = createIconButton("add", "add category");
-    const done = createButton();
-    const title = createH2();
+    const container = creator.dialog();
+    const header = creator.div();
+    const body = creator.div();
+    const add = creator.iconButton("add", "add category");
+    const done = creator.button();
+    const title = creator.h2();
+
     container.classList.add("category-editor");
     body.classList.add("category-list");
     done.classList.add("done");
+
     title.textContent = "Task Categories";
     done.textContent = "done";
+
     done.addEventListener("click", () => container.close());
     add.addEventListener("click", () => {
-        const newLine = createCategoryLine();
+        const newLine = creator.categoryLine();
         const items = newLine.querySelectorAll(".category-line-item");
         const input = newLine.querySelector("input");
         items.forEach(item => item.toggleAttribute("hidden"));
         body.appendChild(newLine);
         input.focus();
     });
-    header.appendChild(title);
-    header.appendChild(add);
-    container.appendChild(header);
-    container.appendChild(body);
-    container.appendChild(done);
-    document.body.appendChild(container);
+
+    header.append(title, add);
+    container.append(header, body, done);
+    document.body.append(container);
 })();
 
 const optionsMenu = (() => {
-    const container = createModal();
-    const newTask = createOption("assignment_add", "New Task");
-    const editCategories = createOption("edit_square", "Edit Categories");
-    const viewArchive = createOption("folder", "View Closed Tasks");
-    container.classList.add("options");
-    viewArchive.addEventListener("click", () => {
-        displayedList = tasks.closed;
-        const tabs = document.querySelector(".tabs");
-        tabs.querySelector(".active")?.classList.remove("active");
-        renderTasks();
-        toggleOptions();
-    });
+    const menu = creator.dialog();
+    const newTask = creator.menuOption("assignment_add", "New Task");
+    const editCategories = creator.menuOption("edit_square", "Edit Categories");
+    const viewArchive = creator.menuOption("folder", "View Closed Tasks");
+    
+    menu.classList.add("options");
+    
     editCategories.addEventListener("click", () => {
         const categoryModal = document.querySelector(".category-editor");
         const categoryList = categoryModal.querySelector(".category-list");
         categoryList.innerHTML = "";
         tasks.categories.forEach(category => {
-            const item = createCategoryLine(category);
+            const item = creator.categoryLine(category);
             categoryList.appendChild(item);
         });
         categoryModal.showModal();
-        toggleOptions();
+        toggleMenu();
     });
-    container.appendChild(newTask);
-    container.appendChild(editCategories);
-    container.appendChild(viewArchive);
-    document.body.appendChild(container);
+    viewArchive.addEventListener("click", () => {
+        displayedList = tasks.closed;
+        const tabs = document.querySelector(".tabs");
+        tabs.querySelector(".active")?.classList.remove("active");
+        renderTasks();
+        toggleMenu();
+    });
+
+    menu.append(newTask, editCategories, viewArchive);
+    document.body.append(menu);
 })();
 
-function createCategoryLine(category = "") {
-    const line = createDiv();
-    const p = createPara();
-    const input = createInput();
-    const edit = createIconButton("edit", "rename category");
-    const trash = createIconButton("delete", "remove category");
-    const accept = createIconButton("done_outline", "accept changes");
-    edit.setAttribute("data-function", "rename");
-    trash.setAttribute("data-function", "trash");
-    accept.setAttribute("data-function", "accept");
-    p.classList.add("category-line-item");
-    input.classList.add("category-line-item");
-    edit.classList.add("category-line-item");
-    trash.classList.add("category-line-item");
-    accept.classList.add("category-line-item");
-    input.toggleAttribute("hidden");
-    trash.toggleAttribute("hidden");
-    accept.toggleAttribute("hidden");
-    p.textContent = category;
-    input.value = p.textContent;
-    line.appendChild(p);
-    line.appendChild(edit);
-    line.appendChild(input);
-    line.appendChild(trash);
-    line.appendChild(accept);
-    line.addEventListener("click", (e) => {
-        const btn = e.target.closest(".icon-button");
-        if (!btn) return;
-        handleCategoryClick(btn);
-    });
-    line.addEventListener("keyup", (e) => {
-        const focused = document.activeElement;
-        if (focused === input && e.key === "Enter") handleCategoryClick(accept);
-    })
-    return line;
-}
+// const taskCreator = (() => {
+//     const container = creator.createModal();
+//     const taskForm = creator.createForm();
+//     //remove after setting styles
+//     taskForm.toggleAttribute("open");
+//     const taskLabel = createLabel();
+//     const taskField = createInput();
+//     const dueLabel = createLabel();
+//     const dueDate = createInput();
+//     const priorityLabel = createLabel();
+//     const priorityValue = createInput();
+//     const categoryLabel = createLabel();
+//     const categoryAdd = createInput();
+//     const categorySelect = createSelect();
+//     const detailsLabel = createLabel();
+//     const detailsArea = createTextarea();
+//     const submitButton = createInput();
+//     const closeButton = createIconButton("close", "close form");
 
-function createElement(element) {
-    return () => {
-        return document.createElement(element);
-    }
-}
+// })();
 
-function createIcon(name) {
-    const icon = createSpan();
-    icon.classList.add("material-symbols-outlined");
-    icon.toggleAttribute("aria-hidden");
-    icon.textContent = name;
-    return icon;
-}
+// function createFormField(label, element, type="undefined") {
 
-function createIconButton(name, desc) {
-    const button = createButton();
-    const icon = createIcon(name);
-    button.appendChild(icon);
-    button.setAttribute("aria-label", desc);
-    button.classList.add("icon-button");
-    return button;
-}
+// }
 
-function createOption(iconName, label) {
-    const p = createPara();
-    const icon = createIcon(iconName);
-    p.textContent = ` ${label}`;
-    p.prepend(icon);
-    return p;
-}
+
+
+
 
 function renderTabs() {
     const tabs = document.querySelector(".tabs");
+
     document.querySelectorAll(".list-tab").forEach(btn => {
         const label = btn.dataset.category;
         if (label !== "all" && !tasks.categories.includes(label)) {
             btn.remove();
         };
     });
+
     const currBtns = [...document.querySelectorAll(".list-tab")]
                         .map(btn => btn.dataset.category);
+
     tasks.categories.forEach(category => {
         if (!currBtns.includes(category)) {
-            const tab = createButton();
+            const tab = creator.button();
+
             tab.textContent = category;
             tab.classList.add("list-tab");
             tab.setAttribute("data-category", category);
-            tabs.appendChild(tab);
+
+            tabs.append(tab);
         };
     });
 }
@@ -167,47 +218,51 @@ function renderTasks() {
     const list = document.querySelector(".list-display");
     list.innerHTML = "";
     displayedList.forEach(task => {
-        const card = createDiv();
-        const title = createH3();
-        const due = createPara();
-        const details = createPara();
-        const category = createPara();
+        const card = creator.div();
+        const title = creator.h3();
+        const due = creator.p();
+        const details = creator.p();
+        const category = creator.p();
+
         card.setAttribute("class", `task ${task.status}`);
         title.classList.add("title");
         due.classList.add("due");
         details.classList.add("details");
         category.classList.add("category");
+
         title.textContent = task.name;
         due.textContent = task.formattedDueDate;
         details.textContent = task.details;
         category.textContent = task.category;
-        card.appendChild(title);
-        card.appendChild(due);
-        card.appendChild(details);
-        card.appendChild(category);
-        list.appendChild(card);
+
+        card.append(title, due, details, category);
+        list.append(card);
     });
 }
 
 export function renderPage() {
-    const main = createDiv();
-    const head = createDiv();
-    const tabs = createDiv();
-    const listDisplay = createDiv();
-    const pageTitle = createH1();
-    const options = createIconButton("more_vert", "options");
-    const allTab = createButton();
+    const main = creator.div();
+    const head = creator.div();
+    const tabs = creator.div();
+    const listDisplay = creator.div();
+    const pageTitle = creator.h1();
+    const menuButton = creator.iconButton("more_vert", "options");
+    const allTab = creator.button();
+
     main.classList.add("main");
     head.classList.add("head");
-    options.classList.add("options-menu");
+    menuButton.classList.add("options-menu");
     tabs.classList.add("tabs");
     allTab.classList.add("list-tab");
     allTab.classList.add("active");
     listDisplay.classList.add("list-display");
+
     allTab.setAttribute("data-category", "all");
+
     pageTitle.textContent = "My To-Dos";
     allTab.textContent = "all tasks";
-    options.addEventListener("click", toggleOptions);
+
+    menuButton.addEventListener("click", toggleMenu);
     tabs.addEventListener("click", (e) => {
         const btn = e.target.closest(".list-tab");
         if (!btn) return;
@@ -221,13 +276,11 @@ export function renderPage() {
         }
         renderTasks();
     });
-    head.appendChild(pageTitle);
-    head.appendChild(options);
-    tabs.appendChild(allTab);
-    main.appendChild(head);
-    main.appendChild(tabs);
-    main.appendChild(listDisplay);
-    document.body.appendChild(main);
+
+    head.append(pageTitle, menuButton);
+    tabs.append(allTab);
+    main.append(head, tabs, listDisplay);
+    document.body.append(main);
     renderTabs();
     renderTasks();
 }
@@ -235,6 +288,7 @@ export function renderPage() {
 function handleCategoryClick(btn) {
     const parent = btn.parentElement;
     const elements = parent.querySelectorAll(".category-line-item");
+
     switch (btn.dataset.function) {
         case "rename":
             elements.forEach(element => element.toggleAttribute("hidden"));
@@ -247,7 +301,7 @@ function handleCategoryClick(btn) {
                 return;
             };
             if (confirm( "Delete this category? All associated tasks will be relabeled as 'general' tasks." )) {
-                parent.parentElement.removeChild(parent);
+                parent.remove();
                 tasks.removeCategory(label);
                 renderTabs();
                 renderTasks();
@@ -268,22 +322,24 @@ function handleCategoryClick(btn) {
 }
 
 function handleOutsideClick(e) {
-    const options = document.querySelector(".options");
-    const optionsButton = document.querySelector(".options-menu");
-    if (!options.contains(e.target) && !optionsButton.contains(e.target)) {
-        toggleOptions();
+    const menu = document.querySelector(".options");
+    const menuButton = document.querySelector(".options-menu");
+
+    if (!menu.contains(e.target) && !menuButton.contains(e.target)) {
+        toggleMenu();
     };
 }
 
-function toggleOptions() {
-    const options = document.querySelector(".options");
-    switch (options.hasAttribute("open")) {
+function toggleMenu() {
+    const menu = document.querySelector(".options");
+
+    switch (menu.hasAttribute("open")) {
         case true:
-            options.close();
+            menu.close();
             document.removeEventListener("click", handleOutsideClick);
             break;
         case false:
-            options.show();
+            menu.show();
             setTimeout(() => {
                 document.addEventListener("click", handleOutsideClick);
             }, 0);
