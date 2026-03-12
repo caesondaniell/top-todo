@@ -6,6 +6,10 @@
   box-sizing: border-box;
 }
 
+.material-symbols-outlined {
+  vertical-align: middle;
+}
+
 .icon-button {
   background-color: transparent;
   border: none;
@@ -104,12 +108,51 @@ h1 {
   background-color: lightgray;
 }
 
-.material-symbols-outlined {
-  vertical-align: middle;
+.task-builder {
+  margin: auto;
+  width: 35ch;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border-radius: 5px;
+}
+
+.task-builder::backdrop {
+  background-color: hsl(0 0% 0% / 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.task-builder > .icon-button {
+  align-self: flex-end;
+}
+
+.task-builder > .icon-button:hover,
+.task-builder input[type="submit"] {
+  cursor: pointer;
+}
+
+form {
+  display: grid;
+  gap: 1em;
+}
+
+form > label {
+  text-transform: capitalize;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.1rem;
+}
+
+textarea {
+  min-height: 4rem;
+}
+
+.task-builder input[type="submit"],
+.list-tab {
+  text-transform: uppercase;
 }
 
 .list-tab {
-  text-transform: uppercase;
   font-size: 0.7rem;
   margin-right: -1.2rem;
   border: 2px solid #ccc;
@@ -135,7 +178,7 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
-.task {
+.task-card {
   border: 3px solid black;
   border-radius: 10px;
   box-shadow: -2px 2px 2px darkgray;
@@ -146,7 +189,7 @@ h1 {
   gap: 3px;
 }
 
-.task.overdue {
+.task-card.overdue {
   box-shadow: 0 0 3px 5px darkred;
 }
 
@@ -155,7 +198,7 @@ h1 {
   text-wrap: balance;
 }
 
-.due {
+.task-card .due {
   border-bottom: 2px dotted lightgray;
 }
 
@@ -163,7 +206,7 @@ h1 {
   text-wrap: pretty;
 }
 
-.category {
+.task-card .category {
   margin-top: auto;
   text-align: right;
   font-size: 0.8em;
