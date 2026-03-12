@@ -190,10 +190,10 @@ const taskBuilder = (() => {
     closeButton.addEventListener("click", () => {
         if (confirm( "Close? Any data you've entered will be lost." )) {
             container.close();
-            clearCategoryOptions();
+            clearForm();
         };
     });
-    // submitButton.addEventListener("click", handleSubmit);
+    submitButton.addEventListener("click", (e) => handleSubmit(e));
 
     category.querySelector("select").append(categoryOption);
     taskForm.append(task, due, priority, category, or, categoryAdd, details, submitButton);
@@ -208,6 +208,39 @@ const taskBuilder = (() => {
         for (let i = options.length - 1; i > 0; i--) {
             options[i].remove();
         };
+    }
+    function clearForm() {
+        task.querySelector("input").value = "";
+        due.querySelector("input").value = "";
+        priority.querySelector("select").value = "low";
+        category.querySelector("select").value = "";
+        categoryAdd.value = "";
+        clearCategoryOptions();
+        details.querySelector("textarea").value = "";
+    }
+    function handleSubmit(e) {
+        const name = task.querySelector("input").value;
+        const date = due.querySelector("input").value === "" ? undefined
+                    : due.querySelector("input").value;
+        const priorityLevel = priority.querySelector("select").value;
+        const priorityCode = priorityLevel === "high" ? 1
+                            :priorityLevel === "medium" ? 2
+                            : 3;
+        const kindSelection = category.querySelector("select").value;
+        const kindAddition = categoryAdd.value;
+        const kind = kindAddition !== "" ? kindAddition
+                    :kindSelection !== "" ? kindSelection
+                    : "general";
+        const info = details.querySelector("textarea").value;
+
+        if (name !== "") {
+            e.preventDefault();
+            tasks.add(name, kind, priorityCode, date, info);
+            renderTabs();
+            renderTasks();
+            clearForm();
+            container.close();
+        }
     }
 })();
 
