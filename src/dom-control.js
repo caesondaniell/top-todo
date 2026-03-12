@@ -237,6 +237,7 @@ const taskBuilder = (() => {
             e.preventDefault();
             tasks.add(name, kind, priorityCode, date, info);
             renderTabs();
+            setList();
             renderTasks();
             clearForm();
             container.close();
@@ -363,14 +364,9 @@ export function renderPage() {
     tabs.addEventListener("click", (e) => {
         const btn = e.target.closest(".list-tab");
         if (!btn) return;
-        const category = btn.dataset.category;
         tabs.querySelector(".active")?.classList.remove("active");
         btn.classList.add("active");
-        if (category === "all") {
-            displayedList = tasks.open;
-        } else {
-            displayedList = tasks.open.filter((t) => t.category === category);
-        }
+        setList();
         renderTasks();
     });
 
@@ -442,4 +438,14 @@ function toggleMenu() {
             }, 0);
             break;
     };
+}
+
+function setList() {
+    const active = document.querySelector(".active");
+    const category = active.dataset.category;
+    if (category === "all") {
+        displayedList = tasks.open;
+    } else {
+        displayedList = tasks.open.filter((t) => t.category === category);
+    }
 }
