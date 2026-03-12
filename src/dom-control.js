@@ -144,6 +144,39 @@ const categoryEditor = (() => {
     document.body.append(container);
 })();
 
+const taskBuilder = (() => {
+    const container = creator.dialog();
+    const taskForm = creator.form();
+    const task = creator.formField("input", "task", "text");
+    const due = creator.formField("input", "due", "date");
+    const priority = creator.formField("select", "priority");
+    const category = creator.formField("select", "category");
+    const categoryOption = creator.option();
+    const categoryAdd = creator.input();
+    const details = creator.formField("textarea", "details");
+    const submitButton = creator.input();
+    const closeButton = creator.iconButton("close", "close form");
+
+    container.classList.add("task-builder");
+
+    categoryAdd.id = "new-category";
+    categoryAdd.placeholder = "New category";
+
+    submitButton.value = "add task";
+    submitButton.type = "submit";
+
+    closeButton.addEventListener("click", () => {
+        if (confirm( "Close? Any data you've entered will be lost." )) {
+            container.close();
+        };
+    });
+    // submitButton.addEventListener("click", handleSubmit);
+
+    taskForm.append(task, due, priority, category, categoryAdd, details, submitButton);
+    container.append(closeButton, taskForm);
+    document.body.append(container);
+})();
+
 const optionsMenu = (() => {
     const menu = creator.dialog();
     const newTask = creator.menuOption("assignment_add", "New Task");
@@ -152,15 +185,22 @@ const optionsMenu = (() => {
     
     menu.classList.add("options");
     
+    newTask.addEventListener("click", () => {
+        const taskBuilder = document.querySelector(".task-builder");
+        const taskInput = document.getElementById("task");
+        taskBuilder.showModal();
+        taskInput.focus();
+        toggleMenu();
+    });
     editCategories.addEventListener("click", () => {
-        const categoryModal = document.querySelector(".category-editor");
-        const categoryList = categoryModal.querySelector(".category-list");
+        const categoryEditor = document.querySelector(".category-editor");
+        const categoryList = categoryEditor.querySelector(".category-list");
         categoryList.innerHTML = "";
         tasks.categories.forEach(category => {
             const item = creator.categoryLine(category);
             categoryList.appendChild(item);
         });
-        categoryModal.showModal();
+        categoryEditor.showModal();
         toggleMenu();
     });
     viewArchive.addEventListener("click", () => {
@@ -174,37 +214,6 @@ const optionsMenu = (() => {
     menu.append(newTask, editCategories, viewArchive);
     document.body.append(menu);
 })();
-
-const taskBuilder = (() => {
-    const container = creator.dialog();
-    const taskForm = creator.form();
-    const task = creator.formField("input", "task", "text");
-    const due = creator.formField("input", "due", "date");
-    const priority = creator.formField("select", "priority");
-    const category = creator.formField("select", "category");
-    const categoryAdd = creator.input();
-    const details = creator.formField("textarea", "details");
-    const submitButton = creator.input();
-    const closeButton = creator.iconButton("close", "close form");
-
-    container.classList.add("task-builder");
-    //remove after setting styles
-    container.toggleAttribute("open");
-
-    categoryAdd.id = "new-category";
-    categoryAdd.placeholder = "New category";
-
-    submitButton.value = "add task";
-    submitButton.type = "submit";
-
-    // submitButton.addEventListener("click", handleSubmit);
-
-    taskForm.append(task, due, priority, category, categoryAdd, details, submitButton);
-    container.append(closeButton, taskForm);
-    document.body.append(container);
-})();
-
-
 
 
 

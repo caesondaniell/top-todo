@@ -10,6 +10,14 @@
   vertical-align: middle;
 }
 
+input[type="text"] {
+  padding-left: 0.2em;
+}
+
+textarea {
+  padding: 0.2em;
+}
+
 .icon-button {
   background-color: transparent;
   border: none;
@@ -108,7 +116,7 @@ h1 {
   background-color: lightgray;
 }
 
-.task-builder {
+.task-builder[open] {
   margin: auto;
   width: 35ch;
   display: flex;
