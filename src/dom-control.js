@@ -89,6 +89,15 @@ const creator = {
 
         return p;
     },
+    selectOptions: function(selector, choices) {
+        const field = document.getElementById(selector);
+        choices.forEach(choice => {
+            const option = this.option();
+            option.value = choice;
+            option.textContent = choice;
+            field.append(option);
+        });
+    },
 };
 
 const tags = [
@@ -148,33 +157,58 @@ const taskBuilder = (() => {
     const container = creator.dialog();
     const taskForm = creator.form();
     const task = creator.formField("input", "task", "text");
+    const taskField = task.querySelector("input");
     const due = creator.formField("input", "due", "date");
     const priority = creator.formField("select", "priority");
+    const priorities = ["low", "medium", "high"];
     const category = creator.formField("select", "category");
     const categoryOption = creator.option();
     const categoryAdd = creator.input();
     const details = creator.formField("textarea", "details");
     const submitButton = creator.input();
     const closeButton = creator.iconButton("close", "close form");
+    const or = creator.p();
+
+    taskField.insertAdjacentText("beforebegin", '* (required)');
+    taskField.required = true;
 
     container.classList.add("task-builder");
+
+    categoryOption.value = "";
+    categoryOption.textContent = "Select category";
 
     categoryAdd.id = "new-category";
     categoryAdd.placeholder = "New category";
 
+    details.querySelector("textarea").autocapitalize = "sentences";
+
     submitButton.value = "add task";
     submitButton.type = "submit";
+
+    or.append("or");
 
     closeButton.addEventListener("click", () => {
         if (confirm( "Close? Any data you've entered will be lost." )) {
             container.close();
+            clearCategoryOptions();
         };
     });
     // submitButton.addEventListener("click", handleSubmit);
 
-    taskForm.append(task, due, priority, category, categoryAdd, details, submitButton);
+    category.querySelector("select").append(categoryOption);
+    taskForm.append(task, due, priority, category, or, categoryAdd, details, submitButton);
     container.append(closeButton, taskForm);
     document.body.append(container);
+
+    creator.selectOptions("priority", priorities);
+
+    function clearCategoryOptions() {
+        const options = category.querySelector("select")
+                                .querySelectorAll("option");
+        for (let i = options.length - 1; i > 0; i--) {
+            options[i].remove();
+        };
+    }
 })();
 
 const optionsMenu = (() => {
@@ -188,6 +222,7 @@ const optionsMenu = (() => {
     newTask.addEventListener("click", () => {
         const taskBuilder = document.querySelector(".task-builder");
         const taskInput = document.getElementById("task");
+        creator.selectOptions("category", tasks.categories.toSorted());
         taskBuilder.showModal();
         taskInput.focus();
         toggleMenu();
