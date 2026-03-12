@@ -151,6 +151,16 @@ form > label {
   font-size: 1.1rem;
 }
 
+form > p,
+#new-category {
+  grid-row: 5 / 6;
+  grid-column: 1 / 2;
+}
+
+form > p {
+  margin: -1.1rem 0 0 1rem;
+}
+
 textarea {
   min-height: 4rem;
 }
