@@ -76,6 +76,7 @@ const creator = {
         button.append(icon);
 
         button.setAttribute("aria-label", desc);
+        button.setAttribute("title", desc);
         button.classList.add("icon-button");
 
         return button;
@@ -366,6 +367,15 @@ const optionsMenu = (() => {
         const tabs = document.querySelector(".tabs");
         tabs.querySelector(".active")?.classList.remove("active");
         renderTasks();
+        const cards = document.querySelectorAll(".task-card");
+        cards.forEach(card => {
+            const icons = card.querySelectorAll("button");
+            icons.forEach(icon => {
+                icon.hidden = icon.dataset.function === "trash" ||
+                            icon.dataset.function === "unarchive" ? false
+                            : true;
+            });
+        });
         toggleMenu();
     });
 
