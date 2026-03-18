@@ -6,6 +6,11 @@
   box-sizing: border-box;
 }
 
+button,
+input[type="submit"] {
+  cursor: pointer;
+}
+
 .material-symbols-outlined {
   vertical-align: middle;
 }
@@ -92,10 +97,6 @@ h1 {
   right: 0.5rem;
 }
 
-.options-menu:hover {
-  cursor: pointer;
-}
-
 .options {
   position: absolute;
   z-index: 10;
@@ -132,11 +133,6 @@ h1 {
 
 .task-builder > .icon-button {
   align-self: flex-end;
-}
-
-.task-builder > .icon-button:hover,
-.task-builder input[type="submit"] {
-  cursor: pointer;
 }
 
 form {
@@ -178,7 +174,6 @@ textarea {
   border-radius: 12px 12px 0 0;
   padding: 0.5rem 1rem;
   background: #f0f0f0;
-  cursor: pointer;
   position: relative;
   z-index: 1;
 }
@@ -193,17 +188,18 @@ textarea {
   margin: 1em;
   display: grid;
   gap: 1em;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
 
 .task-card {
   border: 3px solid black;
   border-radius: 10px;
   box-shadow: -2px 2px 2px darkgray;
-  min-height: 150px;
+  /* min-height: 150px; */
   padding: 0.5em;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-auto-rows: min-content;
   gap: 3px;
 }
 
@@ -211,21 +207,68 @@ textarea {
   box-shadow: 0 0 3px 5px darkred;
 }
 
-.title {
+.title,
+.edit-title {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
   text-transform: capitalize;
   text-wrap: balance;
+}
+
+.task-card .icon-button {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.task-card .due,
+.edit-due {
+  grid-column: 1 / 3;
+  grid-row: 2 / 3;
 }
 
 .task-card .due {
   border-bottom: 2px dotted lightgray;
 }
 
-.details {
+.details,
+.edit-details {
+  grid-column: 1 / 3;
+  grid-row: 3 / 4;
   text-wrap: pretty;
 }
 
-.task-card .category {
-  margin-top: auto;
-  text-align: right;
+.task-card .category,
+.task-card .edit-category {
+  grid-column: 2 / 3;
+  grid-row: 4 / 5;
+  place-self: end end;
   font-size: 0.8em;
+}
+
+.complete {
+  color: green;
+}
+
+.task-card button[data-function="complete"] {
+  place-self: start end;
+}
+
+.task-card button[data-function="edit"] {
+  place-self: start start;
+}
+
+.task-card button[data-function="save"] {
+  place-self: start end;
+}
+
+.task-card button[data-function="trash"] {
+  place-self: start center;
+}
+
+.task-card button[data-function="archive"] {
+  place-self: start start;
+}
+
+.task-card button[data-function="unarchive"] {
+  place-self: start end;
 }
