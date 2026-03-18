@@ -1,4 +1,11 @@
-import { compareAsc, compareDesc, format, isPast, parseISO } from "date-fns";
+import { 
+    compareAsc,
+    compareDesc,
+    format,
+    isPast,
+    parseISO,
+    formatISO 
+} from "date-fns";
 
 const tasks = {
     categories: [],
@@ -88,8 +95,12 @@ class Task {
 
     #status = null;
 
-    get formattedDueDate() {
+    get displayDue() {
         return this.due !== undefined ? format(this.due, 'PPPP') : "";
+    }
+
+    get selectorDue() {
+        return this.due !== undefined ? formatISO(this.due, {representation: 'date'}) : "";
     }
 
     get status() {
@@ -112,7 +123,9 @@ class Task {
     }
 
     edit(property, newValue) {
-        this[property] = property === "due" ? parseISO(newValue) : newValue;
+        this[property] = property === "due" && newValue === "" ? undefined
+                       : property === "due" ? parseISO(newValue) 
+                       : newValue;
     }
 
     trash() {

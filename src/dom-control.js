@@ -158,7 +158,8 @@ const creator = {
 
         title.textContent = task.name;
         titleEdit.value = title.textContent;
-        due.textContent = task.formattedDueDate;
+        due.textContent = task.displayDue;
+        dueEdit.value = task.selectorDue;
         details.textContent = task.details;
         detailsEdit.value = details.textContent;
         category.textContent = task.category;
@@ -511,7 +512,7 @@ function handleIconClick(btn) {
             for (let i = 7; i < 14; i++, i++) {
                 const edited = elements[i];
                 const original = elements[i-1];
-                if (edited.value !== "" && edited.value !== original.textContent) {
+                if (edited.value !== original.textContent) {
                     targetTask.edit(edited.dataset.taskKey, edited.value);
                 };
             };
