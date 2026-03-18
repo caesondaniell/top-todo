@@ -18,20 +18,19 @@ const tasks = {
         const [category, priority, due, details] = rest;
         this.open.push(new Task(name, category, priority, due, details));
         this.updateCategories(this.open.at(-1));
-        this.arrangeByPriority();
-        this.arrangeByDue();
+        this.organize(this.open);
     },
 
-    arrangeByDue(option = "asc") {
+    arrangeByDue(list, option = "asc") {
         if (option === "desc") {
-            this.open.sort((a, b) => compareDesc(a.due, b.due));
+            list.sort((a, b) => compareDesc(a.due, b.due));
             return;
         };
-        this.open.sort((a, b) => compareAsc(a.due, b.due));
+        list.sort((a, b) => compareAsc(a.due, b.due));
     },
 
-    arrangeByPriority() {
-        this.open.sort((a, b) => a.priority - b.priority);
+    arrangeByPriority(list) {
+        list.sort((a, b) => a.priority - b.priority);
     },
 
     changeLabel(oldLabel, newLabel) {
@@ -53,6 +52,17 @@ const tasks = {
         this.categories.unshift(category);
     },
 
+    organize(list) {
+        this.arrangeByPriority(list);
+        this.arrangeByDue(list);
+    },
+
+    printStatus() {
+        this.open.forEach(task => {
+            console.log(task.name, task.status.toUpperCase());
+        })
+    },
+
     removeCategory(category) {
         const position = tasks.categories.indexOf(category);
         tasks.categories.splice(position, 1);
@@ -67,12 +77,6 @@ const tasks = {
         }
         this.categories.splice(position, 1, newLabel);
         this.changeLabel(oldLabel, newLabel);
-    },
-
-    printStatus() {
-        this.open.forEach(task => {
-            console.log(task.name, task.status.toUpperCase());
-        })
     },
 
     updateCategories({ category }) {
@@ -105,7 +109,7 @@ class Task {
 
     get status() {
         if (this.#status !== null) return this.#status;
-        return isPast(this.due) ? "overdue" : "yet to do";
+        return isPast(this.due) ? "overdue" : "undone";
     }
 
     set status(entry) {
@@ -115,10 +119,11 @@ class Task {
     archive() {
         this.trash();
         tasks.closed.push(this);
+        tasks.organize(tasks.closed);
     }
 
     complete() {
-        this.status = "did the do";
+        this.status = "done";
         this.archive();
     }
 
@@ -126,6 +131,7 @@ class Task {
         this[property] = property === "due" && newValue === "" ? undefined
                        : property === "due" ? parseISO(newValue) 
                        : newValue;
+        tasks.organize(tasks.open);
     }
 
     trash() {
@@ -138,6 +144,7 @@ class Task {
         this.trash();
         tasks.open.push(this);
         this.status = null;
+        tasks.organize(tasks.open);
     }
 
     whosMyDad() {
