@@ -8,37 +8,37 @@ const creator = {
         const p = this.p();
         const input = this.input();
         const edit = this.iconButton("edit", "rename category");
-        const trash = this.iconButton("delete", "remove category");
+        const erase = this.iconButton("delete", "remove category");
         const accept = this.iconButton("done_outline", "accept changes");
 
-        edit.setAttribute("data-function", "rename");
-        trash.setAttribute("data-function", "trash");
+        edit.setAttribute("data-function", "edit");
+        erase.setAttribute("data-function", "erase");
         accept.setAttribute("data-function", "accept");
 
         p.classList.add("category-line-item");
         input.classList.add("category-line-item");
         edit.classList.add("category-line-item");
-        trash.classList.add("category-line-item");
+        erase.classList.add("category-line-item");
         accept.classList.add("category-line-item");
 
         input.hidden = true;
-        trash.hidden = true;
+        erase.hidden = true;
         accept.hidden = true;
 
         p.textContent = category;
         input.value = p.textContent;
 
-        line.append(p, edit, input, trash, accept);
+        line.append(p, edit, input, erase, accept);
 
         line.addEventListener("click", (e) => {
             const btn = e.target.closest(".icon-button");
             if (!btn) return;
-            handleCategoryClick(btn);
+            handleIconClick(btn);
         });
 
         line.addEventListener("keyup", (e) => {
             const focused = document.activeElement;
-            if (focused === input && e.key === "Enter") handleCategoryClick(accept);
+            if (focused === input && e.key === "Enter") handleIconClick(accept);
         });
 
         return line;
@@ -90,13 +90,101 @@ const creator = {
         return p;
     },
     selectOptions: function(selector, choices) {
-        const field = document.getElementById(selector);
+        let field = document.getElementById(selector);
+        if (!field) field = selector;
         choices.forEach(choice => {
             const option = this.option();
             option.value = choice;
             option.textContent = choice;
             field.append(option);
         });
+    },
+    taskCard: function(task) {
+        const card = this.div();
+        const title = this.h3();
+        const titleEdit = this.input();
+        const due = this.p();
+        const dueEdit = this.input();
+        const details = this.p();
+        const detailsEdit = this.textarea();
+        const category = this.p();
+        const categoryEdit = this.select();
+        const complete = this.iconButton("check_circle", "complete task");
+        const edit = this.iconButton("edit", "edit task");
+        const archive = this.iconButton("archive", "archive task");
+        const unarchive = this.iconButton("unarchive", "unarchive task");
+        const trash = this.iconButton("delete", "delete task");
+        const save = this.iconButton("done_outline", "save changes");
+
+        dueEdit.type = "date";
+
+        edit.setAttribute("data-function", "edit");
+        trash.setAttribute("data-function", "trash");
+        save.setAttribute("data-function", "save");
+        archive.setAttribute("data-function", "archive");
+        unarchive.setAttribute("data-function", "unarchive");
+        complete.setAttribute("data-function", "complete");
+
+        titleEdit.setAttribute("data-task-key", "name");
+        dueEdit.setAttribute("data-task-key", "due");
+        detailsEdit.setAttribute("data-task-key", "details");
+        categoryEdit.setAttribute("data-task-key", "category");
+
+        card.setAttribute("class", `task-card ${task.status}`);
+        title.setAttribute("class", "task-bit title");
+        due.setAttribute("class", "task-bit due");
+        details.setAttribute("class", "task-bit details");
+        category.setAttribute("class", "task-bit category");
+        titleEdit.setAttribute("class", "task-bit edit-title");
+        dueEdit.setAttribute("class", "task-bit edit-due");
+        detailsEdit.setAttribute("class", "task-bit edit-details");
+        categoryEdit.setAttribute("class", "task-bit edit-category");
+
+        edit.classList.add("task-bit");
+        trash.classList.add("task-bit");
+        save.classList.add("task-bit");
+        archive.classList.add("task-bit");
+        unarchive.classList.add("task-bit");
+        complete.classList.add("task-bit");
+
+        titleEdit.hidden = true;
+        dueEdit.hidden = true;
+        detailsEdit.hidden = true;
+        categoryEdit.hidden = true;
+        archive.hidden = true;
+        unarchive.hidden = true;
+        trash.hidden = true;
+        save.hidden = true;
+
+        title.textContent = task.name;
+        titleEdit.value = title.textContent;
+        due.textContent = task.formattedDueDate;
+        details.textContent = task.details;
+        detailsEdit.value = details.textContent;
+        category.textContent = task.category;
+
+        card.append(edit,
+                    complete,
+                    trash,
+                    archive,
+                    save,
+                    unarchive,
+                    title,
+                    titleEdit,
+                    due,
+                    dueEdit,
+                    details,
+                    detailsEdit,
+                    category,
+                    categoryEdit);
+        
+        card.addEventListener("click", (e) => {
+            const btn = e.target.closest(".icon-button");
+            if (!btn) return;
+            handleIconClick(btn);
+        });
+
+        return card;
     },
 };
 
@@ -316,24 +404,7 @@ function renderTasks() {
     const list = document.querySelector(".list-display");
     list.innerHTML = "";
     displayedList.forEach(task => {
-        const card = creator.div();
-        const title = creator.h3();
-        const due = creator.p();
-        const details = creator.p();
-        const category = creator.p();
-
-        card.setAttribute("class", `task-card ${task.status}`);
-        title.classList.add("title");
-        due.classList.add("due");
-        details.classList.add("details");
-        category.classList.add("category");
-
-        title.textContent = task.name;
-        due.textContent = task.formattedDueDate;
-        details.textContent = task.details;
-        category.textContent = task.category;
-
-        card.append(title, due, details, category);
+        const card = creator.taskCard(task);
         list.append(card);
     });
 }
@@ -378,16 +449,51 @@ export function renderPage() {
     renderTasks();
 }
 
-function handleCategoryClick(btn) {
+function handleIconClick(btn) {
     const parent = btn.parentElement;
-    const elements = parent.querySelectorAll(".category-line-item");
+    const elements = parent.querySelectorAll(`.${btn.classList[1]}`);
+
+    function identifyTask() {
+        const taskTitle = parent.querySelector("h3").textContent;
+        const task = displayedList.find(item => item.name === taskTitle);
+        return task;
+    }
 
     switch (btn.dataset.function) {
-        case "rename":
+        case "accept":
+            const oldLabel = elements[0].textContent;
+            const newLabel = elements[2].value;
+            if (oldLabel !== newLabel) {
+                tasks.renameCategory(oldLabel, newLabel);
+                elements[0].textContent = newLabel;
+                renderTabs();
+                renderTasks();
+            };
             elements.forEach(element => element.toggleAttribute("hidden"));
-            elements[2].focus();
             break;
-        case "trash":
+        case "archive":
+            identifyTask().archive();
+            parent.remove();
+            break;
+        case "complete":
+            identifyTask().complete();
+            parent.remove();
+            break;
+        case "edit":
+            if (parent.classList[0] === "task-card") {
+                const selector = parent.querySelector("select");
+                const current = parent.querySelector(".category").textContent;
+                creator.selectOptions(selector, tasks.categories.toSorted());
+                selector.value = current;
+            };
+            elements.forEach(element => {
+                if (element.dataset.function !== "unarchive") {
+                    element.toggleAttribute("hidden");
+                };
+            });
+            parent.querySelector("input").focus();
+            break;
+        case "erase":
             const label = elements[0].textContent;
             if (label === "general") {
                 alert( "Can't delete the default category." );
@@ -400,16 +506,26 @@ function handleCategoryClick(btn) {
                 renderTasks();
             };
             break;
-        case "accept":
-            const oldLabel = elements[0].textContent;
-            const newLabel = elements[2].value;
-            if (oldLabel !== newLabel) {
-                tasks.renameCategory(oldLabel, newLabel);
-                elements[0].textContent = newLabel;
-                renderTabs();
-                renderTasks();
+        case "save":
+            const targetTask = identifyTask();
+            for (let i = 7; i < 14; i++, i++) {
+                const edited = elements[i];
+                const original = elements[i-1];
+                if (edited.value !== "" && edited.value !== original.textContent) {
+                    targetTask.edit(edited.dataset.taskKey, edited.value);
+                };
             };
-            elements.forEach(element => element.toggleAttribute("hidden"));
+            renderTasks();
+            break;
+        case "trash":
+            if (confirm( "Delete this task? This can't be undone." )) {
+                identifyTask().trash();
+                parent.remove();
+            };
+            break;
+        case "unarchive":
+            identifyTask().unarchive();
+            parent.remove();
             break;
     }
 }
