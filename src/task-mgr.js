@@ -27,7 +27,12 @@ const tasks = {
     add(name, ...rest) {
         const [category, priority, due, details] = rest;
         this.open.push(new Task(name, category, priority, due, details));
-        this.updateCategories(this.open.at(-1));
+        const newTask = this.open.at(-1);
+        this.updateCategories(newTask);
+        if (rest.at(-1) === "archive") {
+            newTask.archive();
+            return;
+        };
         this.organize(this.open);
         this.save();
     },
@@ -62,6 +67,16 @@ const tasks = {
         const position = this.categories.indexOf(category);
         this.categories.splice(position, 1);
         this.categories.unshift(category);
+    },
+
+    load() {
+        if (!storageAvailable("localStorage") || !localStorage.open) return;
+        const open = JSON.parse(localStorage.open);
+        const closed = JSON.parse(localStorage.closed);
+        const categories = JSON.parse(localStorage.categories);
+        this.categories = categories;
+        open.forEach(task => this.add(...JSON.parse(task)));
+        closed.forEach(task => this.add(...JSON.parse(task), "archive"));
     },
 
     organize(list) {

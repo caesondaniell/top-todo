@@ -1,5 +1,7 @@
 import { tasks } from "./task-mgr.js";
 
+tasks.load();
+
 let displayedList = tasks.open;
 
 const creator = {
@@ -382,8 +384,6 @@ const optionsMenu = (() => {
     menu.append(newTask, editCategories, viewArchive);
     document.body.append(menu);
 })();
-
-
 
 function renderTabs() {
     const tabs = document.querySelector(".tabs");
