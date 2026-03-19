@@ -532,6 +532,7 @@ function handleIconClick(btn) {
             if (confirm( "Delete this task? This can't be undone." )) {
                 identifyTask().trash();
                 parent.remove();
+                tasks.save();
             };
             break;
         case "unarchive":

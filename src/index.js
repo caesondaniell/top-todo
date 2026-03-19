@@ -12,5 +12,8 @@ tasks.add("pizza at jeff's", "social", 1, "2026-03-07", "jeff's address...");
 tasks.add("long run", "health", 1);
 tasks.open[2].archive();
 console.log(tasks.open);
+// const tester = tasks.open[1].toJSON;
+// console.log(tester);
+// tasks.add(...JSON.parse(tester));
 
 renderPage();

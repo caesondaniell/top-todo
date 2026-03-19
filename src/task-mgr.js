@@ -2,9 +2,9 @@ import {
     compareAsc,
     compareDesc,
     format,
+    formatISO,
     isPast,
-    parseISO,
-    formatISO 
+    parseISO 
 } from "date-fns";
 
 const tasks = {
@@ -14,11 +14,22 @@ const tasks = {
 
     open: [],
 
+    orgRules: {
+        date: (a, b) => {
+            if (!a.due && !b.due) return 0;
+            if (!a.due) return 1;
+            if (!b.due) return -1;
+            return compareAsc(a.due, b.due);
+        },
+        priority: (a, b) => a.priority - b.priority,
+    },
+
     add(name, ...rest) {
         const [category, priority, due, details] = rest;
         this.open.push(new Task(name, category, priority, due, details));
         this.updateCategories(this.open.at(-1));
         this.organize(this.open);
+        this.save();
     },
 
     arrangeByDue(list, option = "asc") {
@@ -40,6 +51,7 @@ const tasks = {
         this.closed.forEach(task => {
             if (task.category === oldLabel) task.category = newLabel;
         });
+        this.save();
     },
 
     focusCategory(category) {
@@ -53,8 +65,9 @@ const tasks = {
     },
 
     organize(list) {
-        this.arrangeByPriority(list);
-        this.arrangeByDue(list);
+        list.sort((a, b) => {
+            return this.orgRules.date(a, b) || this.orgRules.priority(a, b);
+        });
     },
 
     printStatus() {
@@ -73,16 +86,25 @@ const tasks = {
         const position = this.categories.indexOf(oldLabel);
         if (oldLabel === "") {
             this.categories.push(newLabel);
+            this.save();
             return;
         }
         this.categories.splice(position, 1, newLabel);
         this.changeLabel(oldLabel, newLabel);
     },
 
+    save() {
+        if (!storageAvailable("localStorage")) return;
+        localStorage.setItem("open", store(this.open));
+        localStorage.setItem("closed", store(this.closed));
+        localStorage.setItem("categories", store(this.categories));
+    },
+
     updateCategories({ category }) {
         if (!this.categories.includes(category)) {
             this.categories.push(category);
         };
+        this.save();
     },
 };
 
@@ -112,6 +134,16 @@ class Task {
         return isPast(this.due) ? "overdue" : "undone";
     }
 
+    get toJSON() {
+        return JSON.stringify([
+            this.name,
+            this.category,
+            this.priority,
+            this.selectorDue,
+            this.details
+        ]);
+    }
+
     set status(entry) {
         this.#status = entry;
     }
@@ -120,6 +152,7 @@ class Task {
         this.trash();
         tasks.closed.push(this);
         tasks.organize(tasks.closed);
+        tasks.save();
     }
 
     complete() {
@@ -132,6 +165,7 @@ class Task {
                        : property === "due" ? parseISO(newValue) 
                        : newValue;
         tasks.organize(tasks.open);
+        tasks.save();
     }
 
     trash() {
@@ -145,12 +179,39 @@ class Task {
         tasks.open.push(this);
         this.status = null;
         tasks.organize(tasks.open);
+        tasks.save();
     }
 
     whosMyDad() {
         const lists = [tasks.open, tasks.closed];
         return lists.find(list => list.includes(this));
     }
+}
+
+function store(list) {
+    if (typeof list[0] === "string") return JSON.stringify(list);
+    const data = [];
+    list.forEach(item => data.push(item.toJSON));
+    return JSON.stringify(data);
+}
+
+function storageAvailable(type) {
+  let storage;
+  try {
+    storage = window[type];
+    const x = "__storage_test__";
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  } catch (e) {
+    return (
+      e instanceof DOMException &&
+      e.name === "QuotaExceededError" &&
+      // acknowledge QuotaExceededError only if there's something already stored
+      storage &&
+      storage.length !== 0
+    );
+  }
 }
 
 export { tasks };
