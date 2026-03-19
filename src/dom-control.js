@@ -159,8 +159,8 @@ const creator = {
 
         title.textContent = task.name;
         titleEdit.value = title.textContent;
-        due.textContent = task.displayDue;
-        dueEdit.value = task.selectorDue;
+        due.textContent = task.dueString;
+        dueEdit.value = task.dueISO;
         details.textContent = task.details;
         detailsEdit.value = details.textContent;
         category.textContent = task.category;

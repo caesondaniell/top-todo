@@ -121,11 +121,11 @@ class Task {
 
     #status = null;
 
-    get displayDue() {
+    get dueString() {
         return this.due !== undefined ? format(this.due, 'PPPP') : "";
     }
 
-    get selectorDue() {
+    get dueISO() {
         return this.due !== undefined ? formatISO(this.due, {representation: 'date'}) : "";
     }
 
@@ -139,7 +139,7 @@ class Task {
             this.name,
             this.category,
             this.priority,
-            this.selectorDue,
+            this.dueISO,
             this.details
         ]);
     }
