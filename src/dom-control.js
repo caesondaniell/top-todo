@@ -355,12 +355,7 @@ const optionsMenu = (() => {
     });
     editCategories.addEventListener("click", () => {
         const categoryEditor = document.querySelector(".category-editor");
-        const categoryList = categoryEditor.querySelector(".category-list");
-        categoryList.innerHTML = "";
-        tasks.categories.forEach(category => {
-            const item = creator.categoryLine(category);
-            categoryList.appendChild(item);
-        });
+        populateCategoryList();
         categoryEditor.showModal();
         toggleMenu();
     });
@@ -513,6 +508,7 @@ function handleIconClick(btn) {
             if (confirm( "Delete this category? All associated tasks will be relabeled as 'general' tasks." )) {
                 parent.remove();
                 tasks.removeCategory(label);
+                populateCategoryList();
                 renderTabs();
                 renderTasks();
             };
@@ -549,6 +545,15 @@ function handleOutsideClick(e) {
     if (!menu.contains(e.target) && !menuButton.contains(e.target)) {
         toggleMenu();
     };
+}
+
+function populateCategoryList() {
+    const categoryList = document.querySelector(".category-list");
+    categoryList.innerHTML = "";
+    tasks.categories.forEach(category => {
+        const item = creator.categoryLine(category);
+        categoryList.appendChild(item);
+    });
 }
 
 function toggleMenu() {

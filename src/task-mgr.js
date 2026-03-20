@@ -28,7 +28,7 @@ const tasks = {
         const [category, priority, due, details] = rest;
         this.open.push(new Task(name, category, priority, due, details));
         const newTask = this.open.at(-1);
-        this.updateCategories(newTask);
+        this.updateCategories(newTask.category);
         if (rest.at(-1) === "archive") {
             newTask.archive();
             return;
@@ -56,7 +56,7 @@ const tasks = {
         this.closed.forEach(task => {
             if (task.category === oldLabel) task.category = newLabel;
         });
-        this.save();
+        this.updateCategories(newLabel);
     },
 
     focusCategory(category) {
@@ -115,7 +115,7 @@ const tasks = {
         localStorage.setItem("categories", store(this.categories));
     },
 
-    updateCategories({ category }) {
+    updateCategories(category) {
         if (!this.categories.includes(category)) {
             this.categories.push(category);
         };
