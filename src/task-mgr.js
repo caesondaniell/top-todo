@@ -179,7 +179,7 @@ class Task {
 
     edit(property, newValue) {
         this[property] = property === "due" && newValue === "" ? undefined
-                       : property === "due" ? parseISO(newValue) 
+                       : property === "due" ? endOfDay(parseISO(newValue)) 
                        : newValue;
         tasks.organize(tasks.open);
         tasks.save();
