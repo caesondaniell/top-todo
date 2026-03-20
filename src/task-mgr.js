@@ -1,6 +1,7 @@
 import { 
     compareAsc,
     compareDesc,
+    endOfDay,
     format,
     formatISO,
     isPast,
@@ -129,7 +130,7 @@ class Task {
         this.category = category;
         this.priority = priority;
         this.due = (due === undefined || due === "") ? undefined 
-                    : parseISO(due);
+                    : endOfDay(parseISO(due));
         this.details = details;
     }
 
