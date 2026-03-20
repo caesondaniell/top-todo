@@ -128,7 +128,8 @@ class Task {
         this.name = name;
         this.category = category;
         this.priority = priority;
-        this.due = due === undefined ? due : parseISO(due);
+        this.due = (due === undefined || due === "") ? undefined 
+                    : parseISO(due);
         this.details = details;
     }
 
