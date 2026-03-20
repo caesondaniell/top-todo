@@ -112,6 +112,11 @@ const creator = {
         const detailsEdit = this.textarea();
         const category = this.p();
         const categoryEdit = this.select();
+        const priorityLabel = this.label();
+        const priorityEdit = this.select();
+        const priorityCode = task.priority === 3 ? "low"
+                            : task.priority === 2 ? "medium"
+                            : "high";
         const complete = this.iconButton("check_circle", "complete task");
         const edit = this.iconButton("edit", "edit task");
         const archive = this.iconButton("archive", "archive task");
@@ -120,6 +125,8 @@ const creator = {
         const save = this.iconButton("done_outline", "save changes");
 
         dueEdit.type = "date";
+
+        creator.selectOptions(priorityEdit, ["low", "medium", "high"]);
 
         edit.setAttribute("data-function", "edit");
         trash.setAttribute("data-function", "trash");
@@ -132,6 +139,7 @@ const creator = {
         dueEdit.setAttribute("data-task-key", "due");
         detailsEdit.setAttribute("data-task-key", "details");
         categoryEdit.setAttribute("data-task-key", "category");
+        priorityLabel.setAttribute("data-task-key", "priority");
 
         card.setAttribute("class", `task-card ${task.status}`);
         title.setAttribute("class", "task-bit title");
@@ -142,7 +150,9 @@ const creator = {
         dueEdit.setAttribute("class", "task-bit edit-due");
         detailsEdit.setAttribute("class", "task-bit edit-details");
         categoryEdit.setAttribute("class", "task-bit edit-category");
+        priorityLabel.setAttribute("class", "task-bit edit-priority");
 
+        priorityEdit.classList.add("task-bit");
         edit.classList.add("task-bit");
         trash.classList.add("task-bit");
         save.classList.add("task-bit");
@@ -154,6 +164,8 @@ const creator = {
         dueEdit.hidden = true;
         detailsEdit.hidden = true;
         categoryEdit.hidden = true;
+        priorityLabel.hidden = true;
+        priorityEdit.hidden = true;
         archive.hidden = true;
         unarchive.hidden = true;
         trash.hidden = true;
@@ -166,7 +178,10 @@ const creator = {
         details.textContent = task.details;
         detailsEdit.value = details.textContent;
         category.textContent = task.category;
+        priorityLabel.textContent = "Priority: "
+        priorityEdit.value = priorityCode;
 
+        priorityLabel.append(priorityEdit);
         card.append(edit,
                     complete,
                     trash,
@@ -180,7 +195,8 @@ const creator = {
                     details,
                     detailsEdit,
                     category,
-                    categoryEdit);
+                    categoryEdit,
+                    priorityLabel);
         
         card.addEventListener("click", (e) => {
             const btn = e.target.closest(".icon-button");
@@ -515,12 +531,20 @@ function handleIconClick(btn) {
             break;
         case "save":
             const targetTask = identifyTask();
+            const prioritySelect = parent.querySelector(".edit-priority")
+                                        .firstElementChild;
+            const priorityCode = prioritySelect.value === "low" ? 3
+                                : prioritySelect.value === "medium" ? 2
+                                : 1;
             for (let i = 7; i < 14; i++, i++) {
                 const edited = elements[i];
                 const original = elements[i-1];
                 if (edited.value !== original.textContent) {
                     targetTask.edit(edited.dataset.taskKey, edited.value);
                 };
+            };
+            if (priorityCode !== targetTask.priority) {
+                targetTask.edit("priority", priorityCode);
             };
             renderTasks();
             break;
